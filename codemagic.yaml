@@ -1,0 +1,33 @@
+workflows:
+  android-build:
+    name: Android build (assembleDebug)
+    environment:
+      vars:
+        ANDROID_HOME: /opt/android-sdk
+    scripts:
+      - name: Prepare environment
+        script: |
+          set -e
+          echo "Updating apt and installing required packages..."
+          apt-get update -y
+          apt-get install -y openjdk-17-jdk wget unzip git
+          java -version
+          # Download a standalone Gradle and add to PATH
+          echo "Downloading Gradle 8.6..."
+          wget https://services.gradle.org/distributions/gradle-8.6-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /opt/gradle
+          export PATH=/opt/gradle/gradle-8.6/bin:$PATH
+          gradle -v
+      - name: Ensure gradle wrapper
+        script: |
+          # Create gradle wrapper in the repo using installed gradle if missing
+          if [ ! -f ./gradlew ]; then
+            echo "Generating gradle wrapper..."
+            gradle wrapper --gradle-version 8.6
+            chmod +x ./gradlew
+          fi
+      - name: Build debug APK
+        script: |
+          ./gradlew assembleDebug --no-daemon
+    artifacts:
+      - app/build/outputs/**/*.apk

@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.MyDomik" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>
